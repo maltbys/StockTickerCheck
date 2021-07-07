@@ -1,0 +1,101 @@
+﻿@model StockTickerCheck.Models.InformationModel
+
+@{
+  ViewBag.Title = "Index";
+}
+
+<div class="jumbotron">
+  <h1>Simple Financial Info</h1>
+  <p class="lead">Quickly and easily check basic stock info!</p>
+</div>
+
+<div class="container">
+  <div class="card border-secondary">
+    <div class="card-body">
+      <h2>How to Use</h2>
+      <p>
+        Enter up to 10 different stock ticker symbols (separated by spaces) in the form area below and click <b>"Look It Up!"</b> to find information about the symbols using Yahoo! Finance.
+        Information shown:
+        <ul>
+          <li>Price</li>
+          <li>Earnings Per Share</li>
+          <li>Price/Earnings Ratio (over Trailing Twelve Months)</li>
+        </ul>
+      </p>
+    </div>
+  </div>
+      @using (Html.BeginForm())
+      {
+        @Html.AntiForgeryToken()
+
+        <div class="row mt-3">
+          <div class="col-md-6">
+
+            @Html.TextBox("input", Model != null && Model.Input != null ? Model.Input : "", new { @class = "form-control", style = "width:100%;", placeholder = "Enter symbols here" })
+          </div>
+          <div class="col-md-2">
+            <button type="submit" class="btn btn-primary">Look It Up!</button>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            <span id="inputHelpBlock" class="form-text">
+              Max. 10 symbols.
+            </span>
+          </div>
+        </div>
+      }
+    </div>
+
+    @if (Model != null && !string.IsNullOrEmpty(Model.Error))
+    {
+      <div class="alert alert-danger" role="alert">
+        @Html.Raw(Model.Error)
+      </div>
+    }
+
+    @if (Model != null && Model.Stocks != null && Model.Stocks.Any())
+    {
+        <div class="row mt-3">
+          <div class="col-md-1 bg-secondary text-white">
+            Symbol
+          </div>
+          <div class="col-md-4 bg-secondary text-white">
+            Name
+          </div>
+          <div class="col-md-2 bg-secondary text-white text-end">
+            Price
+          </div>
+          <div class="col-md-2 bg-secondary text-white text-end">
+            Earnings Per Share
+          </div>
+          <div class="col-md-2 bg-secondary text-white text-end">
+            Price/Earnings Ratio
+          </div>
+          </div>
+
+          foreach (var stock in Model.Stocks)
+          {
+            <div class="row">
+              <div class="col-md-1">
+                @stock.Symbol
+              </div>
+
+              <div class="col-md-4">
+                <span class="lead">@stock.FullName</span>
+              </div>
+
+              <div class="col-md-2 text-end">
+                <span class="lead">@string.Format("{0:c}", stock.Price)</span>
+              </div>
+
+              <div class="col-md-2 text-end">
+                @string.Format("{0:c}", stock.EarnPerShare)
+              </div>
+
+              <div class="col-md-2 text-end">
+                @string.Format("{0:n}", stock.PERatio)x
+              </div>
+            </div>
+          }
+    }
